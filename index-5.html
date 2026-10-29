@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2D6E6A">
+<title>Steady Bear</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2EF; --surface:#FFFFFF; --ink:#1C2B2F; --muted:#5E6F72; --line:#D3DDD9;
+  --tide:#2D6E6A; --tide-ink:#FFFFFF; --tide-soft:#D5E6E2; --sun:#E8A93B; --sun-soft:#F7E6C4; --danger:#B4483C;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --head:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;
+  color-scheme:light dark;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#10191B; --surface:#172427; --ink:#E6EEEC; --muted:#93A5A6; --line:#263738;
+  --tide:#6FB7AE; --tide-ink:#0C1A1B; --tide-soft:#1F3735; --sun:#F0B954; --sun-soft:#3A3020; --danger:#E07A6C;
+}}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:17px/1.5 var(--body);-webkit-tap-highlight-color:transparent;
+  padding:env(safe-area-inset-top,0) 0 0}
+h1,h2,h3{font-family:var(--head);font-weight:700;line-height:1.15;margin:0}
+h1{font-size:2rem;letter-spacing:-.01em}
+h2{font-size:1.2rem}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.hidden{display:none!important}
+main{max-width:560px;margin:0 auto;padding:18px 18px 150px}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+.row{display:flex;align-items:center;gap:10px}
+.spread{justify-content:space-between}
+.stack>*+*{margin-top:12px}
+
+/* Top bar */
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:22px}
+.date{font-size:.95rem;color:var(--muted)}
+.sync{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--tide);display:inline-block}
+.sync.waiting i{background:var(--sun)}
+.iconbtn{background:none;border:0;padding:8px;border-radius:12px;font-size:1.3rem;line-height:1}
+
+/* Blocks */
+.block{background:var(--surface);border-radius:20px;padding:18px;margin-bottom:14px}
+.block h2{margin-bottom:10px}
+.plain{padding:4px 2px;margin-bottom:22px}
+.status{font-family:var(--head);font-size:1.15rem;font-weight:500}
+
+/* Buttons */
+.btn{border:0;border-radius:999px;padding:13px 20px;min-height:48px;background:var(--tide);color:var(--tide-ink);font-weight:700}
+.btn.soft{background:var(--tide-soft);color:var(--ink)}
+.btn.ghost{background:none;border:1.5px solid var(--line);color:var(--ink)}
+.btn.wide{width:100%}
+.btn:disabled{opacity:.45}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{border:1.5px solid var(--line);background:none;border-radius:999px;padding:8px 14px;min-height:40px;font-size:.92rem}
+.chip.on{background:var(--tide);border-color:var(--tide);color:var(--tide-ink)}
+
+/* Lists */
+.list{list-style:none;margin:0;padding:0}
+.item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item .grow{flex:1;min-width:0;overflow-wrap:anywhere}
+.check{width:30px;height:30px;flex:none;border-radius:50%;border:2px solid var(--tide);background:none;display:grid;place-items:center;color:var(--tide-ink);font-size:.9rem}
+.check.done{background:var(--tide)}
+.done-text{text-decoration:line-through;color:var(--muted)}
+.star{background:none;border:0;font-size:1.25rem;padding:6px;color:var(--line)}
+.star.on{color:var(--sun)}
+.x{background:none;border:0;color:var(--muted);font-size:1.1rem;padding:6px}
+.three .item{padding:14px 0}
+.three .grow{font-size:1.1rem}
+.empty{color:var(--muted);padding:6px 0}
+
+/* Inbox */
+.capture{padding:14px 0;border-bottom:1px solid var(--line)}
+.capture:last-child{border-bottom:0}
+.capture p{margin:0 0 4px;white-space:pre-wrap;overflow-wrap:anywhere}
+
+/* Inputs */
+input[type=text],input[type=email],input[type=time],input[type=number],textarea,select{
+  width:100%;background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;min-height:48px}
+textarea{min-height:120px;resize:vertical}
+label.f{display:block;font-size:.9rem;color:var(--muted);margin:14px 0 6px}
+.scale{display:flex;gap:6px}
+.scale button{flex:1;min-height:46px;border-radius:12px;border:1.5px solid var(--line);background:none;font-weight:700}
+.scale button.on{background:var(--tide);border-color:var(--tide);color:var(--tide-ink)}
+.scale-ends{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);margin-top:4px}
+.stepper{display:flex;align-items:center;gap:14px}
+.stepper button{width:48px;height:48px;border-radius:50%;border:1.5px solid var(--line);background:none;font-size:1.4rem}
+.stepper output{font-family:var(--head);font-size:1.6rem;min-width:70px;text-align:center}
+
+/* Nav + FAB */
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);
+  display:flex;justify-content:space-around;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0));z-index:20}
+nav button{flex:1;background:none;border:0;padding:8px 2px;border-radius:14px;font-size:.78rem;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+nav button span{font-size:1.3rem;line-height:1.2}
+nav button.on{color:var(--ink);font-weight:700;background:var(--tide-soft)}
+.badge{position:absolute;top:2px;right:22%;background:var(--sun);color:#1C2B2F;border-radius:999px;font-size:.7rem;padding:0 6px;font-weight:700}
+.fab{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom,0));width:64px;height:64px;border-radius:50%;
+  border:0;background:var(--sun);color:#1C2B2F;font-size:2rem;font-weight:700;box-shadow:0 6px 18px rgba(28,43,47,.25);z-index:21}
+
+/* Sheets */
+.scrim{position:fixed;inset:0;background:rgba(10,20,22,.45);z-index:30;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:560px;border-radius:24px 24px 0 0;padding:20px 18px calc(22px + env(safe-area-inset-bottom,0));
+  max-height:92vh;overflow:auto;animation:up .18s ease-out}
+@keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
+.sheet h2{margin-bottom:6px}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:-6px auto 14px}
+
+/* Breathing */
+.breath{display:grid;place-items:center;padding:10px 0 4px}
+.orb-wrap{width:260px;height:260px;display:grid;place-items:center;position:relative}
+.orb{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 40% 35%,var(--tide-soft),var(--tide));
+  transform:scale(1);transition-property:transform;transition-timing-function:ease-in-out}
+.orb-ring{position:absolute;inset:0;border-radius:50%;border:2px dashed var(--line)}
+.orb-label{position:absolute;text-align:center;pointer-events:none}
+.orb-label b{display:block;font-family:var(--head);font-size:1.35rem}
+.orb-label span{font-family:var(--head);font-size:2.4rem;font-weight:700}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:calc(160px + env(safe-area-inset-bottom,0));transform:translateX(-50%);background:var(--ink);color:var(--bg);
+  padding:12px 18px;border-radius:14px;z-index:50;max-width:90vw;font-size:.95rem}
+
+/* Sign-in */
+.signin{min-height:100vh;display:grid;place-items:center;padding:24px}
+.signin .box{width:100%;max-width:380px}
+.signin h1{font-size:2.6rem;margin-bottom:6px}
+
+/* Bear + journey */
+.bear{width:44px;height:44px;flex:none}
+.bear.big{width:96px;height:96px;margin-bottom:8px}
+.progress{height:8px;border-radius:4px;background:var(--tide-soft);overflow:hidden;margin:10px 0 12px}
+.progress i{display:block;height:100%;background:var(--sun)}
+.ch{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:0;padding:14px 0;border-bottom:1px solid var(--line)}
+.ch:last-child{border-bottom:0}
+.ch .em{font-size:1.6rem;width:40px;text-align:center}
+.ch .grow{flex:1}
+.ch .tick{color:var(--tide);font-weight:700}
+.chapter .em{font-size:2.6rem;line-height:1}
+.chapter h1{margin:8px 0 18px}
+.chapter h2{margin:22px 0 6px}
+.chapter p{line-height:1.65;max-width:62ch;margin:0 0 12px}
+.listen{background:var(--sun-soft);border-radius:18px;padding:14px 16px;margin-bottom:8px}
+.listen audio{width:100%;margin-top:8px}
+.back{background:none;border:0;color:var(--muted);padding:6px 0;margin-bottom:8px;font-size:.95rem}
+@media (prefers-reduced-motion:reduce){.sheet{animation:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="journey.js"></script>
+<script>
+'use strict';
+/* ---------- Config ---------- */
+const CFG = {
+  name: 'Steady Bear',
+  url: 'https://zskqjwwcyczezouglzmi.supabase.co',
+  key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpza3Fqd3djeWN6ZXpvdWdsem1pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDMzMDEsImV4cCI6MjA5Njc3OTMwMX0.ofebeGhucWa6G7MpoUIyJhthK2CnK8PPkAPINg7HW7s',
+  tz: 'America/New_York'
+};
+const sb = supabase.createClient(CFG.url, CFG.key, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: 'jo.auth' }
+});
+
+const BEAR = cls => `<svg class="bear ${cls || ''}" viewBox="0 0 100 100" aria-hidden="true">
+  <circle cx="28" cy="30" r="12" fill="#B07A4F"/><circle cx="72" cy="30" r="12" fill="#B07A4F"/>
+  <circle cx="28" cy="30" r="6.5" fill="#7A5032"/><circle cx="72" cy="30" r="6.5" fill="#7A5032"/>
+  <circle cx="50" cy="54" r="33" fill="#B07A4F"/><ellipse cx="50" cy="66" rx="15" ry="11" fill="#EBD3B0"/>
+  <circle cx="38" cy="48" r="3.6" fill="#281E1A"/><circle cx="62" cy="48" r="3.6" fill="#281E1A"/>
+  <ellipse cx="50" cy="61" rx="5.5" ry="3.8" fill="#281E1A"/>
+  <path d="M44 67 q3 4 6 0 q3 4 6 0" stroke="#281E1A" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>`;
+const CH = window.JOURNEY || [];
+
+/* ---------- Small helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
+const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const uuid = () => crypto.randomUUID();
+const fmt = o => new Intl.DateTimeFormat('en-US', { timeZone: CFG.tz, ...o });
+const ymd = d => new Intl.DateTimeFormat('en-CA', { timeZone: CFG.tz, year:'numeric', month:'2-digit', day:'2-digit' }).format(d);
+const hm24 = d => new Intl.DateTimeFormat('en-GB', { timeZone: CFG.tz, hour:'2-digit', minute:'2-digit', hourCycle:'h23' }).format(d);
+const t12 = d => fmt({ hour:'numeric', minute:'2-digit' }).format(d).toLowerCase().replace(' ', '\u202f');
+const today = () => ymd(new Date());
+const daysAgo = n => ymd(new Date(Date.now() - n * 864e5));
+const cut12 = t => { if (!t) return ''; const [h, m] = t.split(':').map(Number); const d = new Date(2000,0,1,h,m); return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}).toLowerCase().replace(' ', '\u202f'); };
+function toast(msg, ms = 2800) {
+  const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role','status'); t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), ms);
+}
+
+/* ---------- State, cache, offline queue ---------- */
+const EMPTY = { tasks:[], inbox:[], worries:[], checkins:[], plan:null, doses:[], profile:null, audio:[] };
+let S = { ...EMPTY, ...load('jo.cache', EMPTY) };
+let Q = load('jo.queue', []);
+let user = null, view = 'today', flushing = false, JC = null;
+const KEY = { jo_tasks:'tasks', jo_inbox:'inbox', jo_worries:'worries', jo_checkins:'checkins', jo_med_doses:'doses', jo_med_plan:'plan', jo_profile:'profile' };
+const persist = () => { store('jo.cache', S); store('jo.queue', Q); };
+
+function applyLocal(op) {
+  const k = KEY[op.t]; if (!k) return;
+  if (k === 'plan' || k === 'profile') { if (op.k === 'up') S[k] = { ...(S[k] || {}), ...op.row }; return; }
+  const arr = S[k];
+  const match = r => op.t === 'jo_checkins' ? r.day === (op.row?.day) : r.id === (op.row?.id || op.id);
+  const i = arr.findIndex(match);
+  if (op.k === 'del') { if (i >= 0) arr.splice(i, 1); return; }
+  if (i >= 0) arr[i] = { ...arr[i], ...op.row }; else arr.unshift({ ...op.row });
+}
+function find(k, id) { return (S[k] || []).find(r => r.id === id); }
+
+// Every write: merge into the full local row, apply instantly, queue, then try to send.
+function save(t, changes) {
+  const k = KEY[t];
+  let base = {};
+  if (k === 'plan' || k === 'profile') base = S[k] || {};
+  else if (t === 'jo_checkins') base = S.checkins.find(c => c.day === changes.day) || {};
+  else if (changes.id) base = find(k, changes.id) || {};
+  const row = { ...base, ...changes, owner: user.id };
+  const noId = t === 'jo_checkins' || t === 'jo_profile';
+  if (!noId && !row.id) row.id = uuid();
+  if (noId) delete row.id;
+  delete row.updated_at;
+  const op = { k:'up', t, row, c: t === 'jo_checkins' ? 'owner,day' : t === 'jo_profile' ? 'owner' : 'id' };
+  applyLocal(op); Q.push(op); persist(); render(); flush();
+  return row;
+}
+
+const retryable = r => !r.status || r.status >= 500 || r.status === 408 || r.status === 429 ||
+  /fetch|network/i.test(r.error?.message || '');
+
+async function flush() {
+  if (flushing || !user || !Q.length) { renderSync(); return; }
+  flushing = true; renderSync();
+  try {
+    while (Q.length) {
+      const op = Q[0];
+      const res = op.k === 'up'
+        ? await sb.from(op.t).upsert(op.row, { onConflict: op.c })
+        : await sb.from(op.t).delete().eq('id', op.id);
+      if (res.error) {
+        if (retryable(res)) break;
+        Q.shift(); persist();
+        const m = res.error.message || '';
+        if (m.includes('JO_DOSE_LIMIT')) toast('That dose wasn\u2019t saved: the daily limit was already reached.', 5000);
+        else toast('Couldn\u2019t save a change: ' + m, 5000);
+        await refresh(); continue;
+      }
+      Q.shift(); persist();
+    }
+  } finally { flushing = false; renderSync(); }
+}
+window.addEventListener('online', flush);
+setInterval(flush, 30000);
+
+async function refresh() {
+  if (!user) return;
+  const since8 = new Date(Date.now() - 8 * 864e5).toISOString();
+  const since1 = new Date(Date.now() - 36 * 36e5).toISOString();
+  const [tasks, inbox, worries, checkins, plan, doses, profile, audio] = await Promise.all([
+    sb.from('jo_tasks').select('*').or(`done_at.is.null,done_at.gte."${since1}"`).order('created_at'),
+    sb.from('jo_inbox').select('*').is('sorted_at', null).order('created_at', { ascending:false }),
+    sb.from('jo_worries').select('*').is('resolved_at', null).order('created_at'),
+    sb.from('jo_checkins').select('*').gte('day', daysAgo(30)).order('day', { ascending:false }),
+    sb.from('jo_med_plan').select('*').eq('active', true).order('created_at', { ascending:false }).limit(1),
+    sb.from('jo_med_doses').select('*').gte('taken_at', since8).order('taken_at', { ascending:false }),
+    sb.from('jo_profile').select('*').eq('owner', user.id).maybeSingle(),
+    sb.from('jo_journey_audio').select('chapter,path,mime,updated_at')
+  ]);
+  const all = [tasks, inbox, worries, checkins, plan, doses, profile, audio];
+  if (all.some(r => r.error)) { renderSync(true); return; }
+  S = { tasks: tasks.data, inbox: inbox.data, worries: worries.data, checkins: checkins.data,
+        plan: plan.data[0] || null, doses: doses.data, profile: profile.data, audio: audio.data };
+  Q.forEach(applyLocal);   // keep changes that haven't reached the server yet
+  persist(); render();
+}
+
+/* ---------- Derived data ---------- */
+const openInbox = () => S.inbox.filter(i => !i.sorted_at);
+const doneToday = t => t.done_at && ymd(new Date(t.done_at)) === today();
+const topThree = () => S.tasks.filter(t => t.top3_date === today() && (!t.done_at || doneToday(t)));
+const openTasks = () => S.tasks.filter(t => !t.done_at);
+const todayCheckin = () => S.checkins.find(c => c.day === today());
+const dosesToday = () => S.doses.filter(d => ymd(new Date(d.taken_at)) === today())
+  .sort((a, b) => new Date(a.taken_at) - new Date(b.taken_at));
+
+const readMap = () => (S.profile?.settings?.journey) || {};
+const readCount = () => CH.filter(c => readMap()[c.key]).length;
+const nextChapter = () => CH.find(c => !readMap()[c.key]) || null;
+const audioFor = key => (S.audio || []).find(a => a.chapter === key);
+
+/* ---------- Auth ---------- */
+async function boot() {
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  const { data } = await sb.auth.getSession();
+  if (data.session) return enter(data.session.user);
+  renderSignIn();
+}
+sb.auth.onAuthStateChange((ev, session) => {
+  if (ev === 'SIGNED_IN' && session && !user) enter(session.user);
+  if (ev === 'SIGNED_OUT') { user = null; renderSignIn(); }
+});
+
+async function enter(u) {
+  user = u;
+  if (load('jo.member') !== u.id) {
+    const { data, error } = await sb.from('jo_members').select('role').eq('user_id', u.id).maybeSingle();
+    if (error && retryable({ error })) { /* offline first run: try anyway */ }
+    else if (!data || data.role !== 'owner') return renderNoAccess(u.email);
+    if (data) store('jo.member', u.id);
+  }
+  render(); refresh().then(() => { if (view === 'journey' && JC) loadChapterAudio(); }).then(flush);
+}
+
+function renderSignIn(step = 'email', email = load('jo.email', '')) {
+  document.body.classList.remove('signed');
+  $('#app').innerHTML = `<div class="signin"><div class="box">
+    ${BEAR('big')}<h1>${CFG.name}</h1>
+    <p class="muted">A quiet place for the things in your head.</p>
+    ${step === 'email' ? `
+      <label class="f" for="em">Your email</label>
+      <input id="em" type="email" autocomplete="email" value="${esc(email)}" placeholder="you@example.com">
+      <button class="btn wide" style="margin-top:14px" data-act="send-code">Email me a sign-in link</button>
+    ` : `
+      <p>Check <b>${esc(email)}</b>. Tap the link in the email, or type the code if the email has one.</p>
+      <label class="f" for="code">Code</label>
+      <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10">
+      <button class="btn wide" style="margin-top:14px" data-act="verify-code">Sign in</button>
+      <button class="btn ghost wide" style="margin-top:10px" data-act="back-email">Use a different email</button>
+    `}
+    <p id="authmsg" class="small muted" role="status"></p>
+  </div></div>`;
+}
+function renderNoAccess(email) {
+  $('#app').innerHTML = `<div class="signin"><div class="box stack">
+    <h1>${CFG.name}</h1>
+    <p>${esc(email)} isn\u2019t set up for this app.</p>
+    <button class="btn wide" data-act="signout">Sign out</button></div></div>`;
+}
+
+/* ---------- Rendering ---------- */
+function render() {
+  if (!user) return;
+  if (!$('#shell')) {
+    $('#app').innerHTML = `<div id="shell"><main id="view"></main>
+      <button class="fab" data-act="capture" aria-label="Capture a thought">+</button>
+      <nav id="nav"></nav></div>`;
+  }
+  const n = openInbox().length;
+  const tabs = [['today','\u2600\uFE0F','Today'],['tasks','\u2705','Tasks'],['inbox','\uD83D\uDCE5','Inbox'],['calm','\uD83C\uDF0A','Calm'],['meds','\uD83D\uDC8A','Meds']];
+  $('#nav').innerHTML = tabs.map(([k, i, l]) => `<button class="${view === k ? 'on' : ''}" data-act="go" data-v="${k}" aria-current="${view === k ? 'page' : 'false'}">
+    <span aria-hidden="true">${i}</span>${l}${k === 'inbox' && n ? `<b class="badge">${n}</b>` : ''}</button>`).join('');
+  const ch = $('.chapter');
+  const keepChapter = view === 'journey' && JC && ch && ch.dataset.k === JC && ($('#chaudio') || !audioFor(JC));
+  if (keepChapter) { /* don't interrupt reading or a playing recording */ }
+  else if (view === 'calm' && $('#breath')) { renderWorries(); }
+  else $('#view').innerHTML = ({ today: vToday, tasks: vTasks, inbox: vInbox, calm: vCalm, meds: vMeds, journey: () => JC ? vChapter() : vJourney() })[view]();
+  if (view === 'calm') renderWorries();
+  renderSync();
+}
+function renderSync(failed) {
+  const el = $('#sync'); if (!el) return;
+  const n = Q.length;
+  el.className = 'sync' + (n || failed ? ' waiting' : '');
+  el.innerHTML = `<i></i>${n ? `${n} waiting to sync` : failed ? 'Offline \u2014 showing saved copy' : 'Saved'}`;
+}
+const topBar = (title, sub) => `<div class="top"><div class="row" style="align-items:flex-start">${BEAR()}<div>
+  <div class="date">${sub || fmt({ weekday:'long', month:'long', day:'numeric' }).format(new Date())}</div>
+  <h1>${title}</h1><div id="sync" class="sync"></div></div></div>
+  <div class="row" style="gap:0"><button class="iconbtn" data-act="go" data-v="journey" aria-label="Your journey">\uD83D\uDCD6</button>
+  <button class="iconbtn" data-act="settings" aria-label="Settings">\u2699\uFE0F</button></div></div>`;
+
+function greeting() {
+  const h = +hm24(new Date()).slice(0, 2);
+  return h < 5 ? 'Still up, Joel?' : h < 12 ? 'Good morning, Joel.' : h < 17 ? 'Good afternoon, Joel.' : 'Good evening, Joel.';
+}
+
+function taskRow(t, opts = {}) {
+  const done = !!t.done_at;
+  return `<li class="item"><button class="check ${done ? 'done' : ''}" data-act="toggle-task" data-id="${t.id}" aria-label="${done ? 'Mark not done' : 'Mark done'}">${done ? '\u2713' : ''}</button>
+    <span class="grow ${done ? 'done-text' : ''}">${esc(t.title)}</span>
+    ${opts.star ? `<button class="star ${t.top3_date === today() ? 'on' : ''}" data-act="star" data-id="${t.id}" aria-label="Today\u2019s three">\u2605</button>` : ''}
+    ${opts.del ? `<button class="x" data-act="del-task" data-id="${t.id}" aria-label="Delete task">\u2715</button>` : ''}</li>`;
+}
+
+function vToday() {
+  const three = topThree(), n = openInbox().length, ci = todayCheckin();
+  const nx = nextChapter();
+  return topBar(greeting()) + (nx ? `
+  <section class="block"><h2>Your journey</h2>
+    <p class="muted" style="margin:0">${readCount() ? `${readCount()} of ${CH.length} chapters read.` : 'Short chapters on why each part of the app exists.'}</p>
+    <div class="progress"><i style="width:${Math.round(100 * readCount() / CH.length)}%"></i></div>
+    <button class="btn" data-act="open-chapter" data-k="${nx.key}">${readCount() ? 'Continue' : 'Start'}: ${esc(nx.title)}</button>
+    ${audioFor(nx.key) ? `<p class="small muted" style="margin:10px 0 0">\uD83C\uDFA7 There\u2019s a recording for this one.</p>` : ''}</section>` : '') + `
+  <section class="plain three"><h2>Today\u2019s three</h2>
+    ${three.length ? `<ul class="list">${three.map(t => taskRow(t)).join('')}</ul>` :
+      `<p class="empty">Pick up to three things that would make today a win. Everything else can wait.</p>`}
+    ${three.length < 3 ? `<button class="btn soft" style="margin-top:8px" data-act="go" data-v="tasks">Choose from tasks</button>` : ''}
+  </section>
+  ${medBlock(true)}
+  <section class="block"><div class="row spread"><h2>Check-in</h2>
+    ${ci ? `<button class="chip" data-act="checkin">Edit</button>` : ''}</div>
+    ${ci ? `<p class="muted" style="margin:0">Mood ${ci.mood ?? '\u2013'} \u00b7 Anxiety ${ci.anxiety ?? '\u2013'} \u00b7 Focus ${ci.focus ?? '\u2013'}${ci.sleep_hours != null ? ` \u00b7 Slept ${ci.sleep_hours}h` : ''}</p>`
+         : `<p class="muted" style="margin:0 0 12px">Ten seconds: mood, anxiety, focus, sleep.</p><button class="btn" data-act="checkin">Check in</button>`}
+  </section>
+  ${n ? `<section class="block"><h2>${n} ${n === 1 ? 'thing' : 'things'} in your inbox</h2>
+    <p class="muted" style="margin:0 0 12px">They\u2019re written down. Sort them when you have a minute.</p>
+    <button class="btn soft" data-act="go" data-v="inbox">Sort inbox</button></section>` : ''}
+  <section class="block"><h2>Need a reset?</h2>
+    <p class="muted" style="margin:0 0 12px">Four rounds of 4-7-8 breathing takes about a minute.</p>
+    <button class="btn soft" data-act="go" data-v="calm">Breathe</button></section>`;
+}
+
+function vTasks() {
+  const three = openTasks().filter(t => t.top3_date === today());
+  const rest = openTasks().filter(t => t.top3_date !== today());
+  const done = S.tasks.filter(doneToday);
+  return topBar('Tasks') + `
+  <div class="row" style="margin-bottom:16px"><input id="newtask" type="text" placeholder="Add a task" aria-label="New task">
+    <button class="btn" data-act="add-task">Add</button></div>
+  <section class="block"><h2>Today\u2019s three <span class="muted small">(${topThree().length}/3)</span></h2>
+    ${three.length ? `<ul class="list">${three.map(t => taskRow(t, { star:1, del:1 })).join('')}</ul>` : `<p class="empty">Tap \u2605 on a task to add it here.</p>`}</section>
+  <section class="block"><h2>Everything else</h2>
+    ${rest.length ? `<ul class="list">${rest.map(t => taskRow(t, { star:1, del:1 })).join('')}</ul>` : `<p class="empty">Nothing else open.</p>`}</section>
+  ${done.length ? `<section class="block"><h2>Done today</h2><ul class="list">${done.map(t => taskRow(t)).join('')}</ul></section>` : ''}`;
+}
+
+function vInbox() {
+  const items = openInbox();
+  return topBar('Inbox') + `<section class="block">
+    ${items.length ? items.map(i => `<div class="capture"><p>${esc(i.text)}</p>
+      <div class="small muted">${fmt({ weekday:'short', hour:'numeric', minute:'2-digit' }).format(new Date(i.created_at || Date.now()))}</div>
+      <div class="chips">
+        <button class="chip" data-act="sort" data-to="task" data-id="${i.id}">Task</button>
+        <button class="chip" data-act="sort" data-to="top3" data-id="${i.id}">\u2605 Today</button>
+        <button class="chip" data-act="sort" data-to="worry" data-id="${i.id}">Worry</button>
+        <button class="chip" data-act="sort" data-to="note" data-id="${i.id}">Keep as note</button>
+        <button class="chip" data-act="sort" data-to="deleted" data-id="${i.id}">Delete</button>
+      </div></div>`).join('')
+    : `<p class="empty">Inbox is clear. Tap + whenever something pops into your head.</p>`}</section>`;
+}
+
+/* ---------- Journey ---------- */
+function vJourney() {
+  const n = readCount();
+  return topBar('Your journey', `${n} of ${CH.length} read`) + `<section class="block">
+    <p class="muted" style="margin:0 0 4px">Why each part of ${CFG.name} exists, one short chapter at a time.</p>
+    ${CH.map((c, i) => `<button class="ch" data-act="open-chapter" data-k="${c.key}">
+      <span class="em" aria-hidden="true">${c.emoji}</span>
+      <span class="grow"><span class="small muted">Chapter ${i + 1}</span><br><b>${esc(c.title)}</b>${audioFor(c.key) ? ' <span aria-label="has a recording">\uD83C\uDFA7</span>' : ''}</span>
+      ${readMap()[c.key] ? '<span class="tick" aria-label="read">\u2713</span>' : ''}</button>`).join('')}
+  </section>`;
+}
+function vChapter() {
+  const i = CH.findIndex(c => c.key === JC), c = CH[i], a = audioFor(c.key), last = i === CH.length - 1;
+  return `<article class="chapter" data-k="${c.key}">
+    <button class="back" data-act="go" data-v="journey">\u2190 All chapters</button>
+    <div class="em" aria-hidden="true">${c.emoji}</div>
+    <div class="small muted" style="margin-top:8px">Chapter ${i + 1} of ${CH.length}</div>
+    <h1>${esc(c.title)}</h1>
+    ${a ? `<div class="listen"><b>\uD83C\uDFA7 Listen</b> <span class="small muted">Recorded for you \uD83D\uDC99</span>
+      <audio id="chaudio" controls preload="none"></audio><div id="audiomsg" class="small muted"></div></div>` : ''}
+    <h2>Why</h2>${c.why.map(p => `<p>${esc(p)}</p>`).join('')}
+    <h2>How</h2>${c.how.map(p => `<p>${esc(p)}</p>`).join('')}
+    ${c.tryIt ? `<button class="btn soft wide" style="margin-top:10px" data-act="try" data-k="${c.key}">${esc(c.tryIt.label)}</button>` : ''}
+    <button class="btn wide" style="margin-top:10px" data-act="chapter-done" data-k="${c.key}">${last ? 'Finish the journey' : 'Mark as read, next chapter'}</button>
+  </article>`;
+}
+async function loadChapterAudio() {
+  const el = $('#chaudio'), a = JC && audioFor(JC); if (!el || !a) return;
+  const { data, error } = await sb.storage.from('jo-media').createSignedUrl(a.path, 3600);
+  if (error || !data) { const m = $('#audiomsg'); if (m) m.textContent = 'The recording needs a connection to play.'; return; }
+  el.src = data.signedUrl;
+}
+function markRead(key) {
+  const settings = { ...(S.profile?.settings || {}) };
+  settings.journey = { ...(settings.journey || {}), [key]: new Date().toISOString() };
+  save('jo_profile', { settings });
+}
+
+/* ---------- Calm: 4-7-8 breathing + parked worries ---------- */
+let B = { running:false, timer:null, rounds:4, easy:false };
+function vCalm() {
+  return topBar('Calm') + `
+  <section class="block" id="breath"><h2>4-7-8 breathing</h2>
+    <div class="breath"><div class="orb-wrap"><div class="orb-ring"></div><div class="orb" id="orb"></div>
+      <div class="orb-label"><b id="phase">Ready</b><span id="count"></span></div></div>
+      <p class="muted small" id="roundinfo" aria-live="polite">In through your nose, out through your mouth.</p></div>
+    <div class="chips" role="group" aria-label="Rounds">${[4, 6, 8].map(r => `<button class="chip ${B.rounds === r ? 'on' : ''}" data-act="rounds" data-r="${r}">${r} rounds</button>`).join('')}
+      <button class="chip ${B.easy ? 'on' : ''}" data-act="easy">Easy mode</button></div>
+    <button class="btn wide" style="margin-top:14px" id="breathbtn" data-act="breathe">Start</button>
+  </section>
+  <section class="block"><h2>Parked worries</h2><div id="worries"></div></section>`;
+}
+function renderWorries() {
+  const el = $('#worries'); if (!el) return;
+  el.innerHTML = S.worries.length ? S.worries.map(w => `<div class="capture"><p>${esc(w.text)}</p>
+    <div class="chips"><button class="chip" data-act="worry-task" data-id="${w.id}">Make it a task</button>
+    <button class="chip" data-act="worry-go" data-id="${w.id}">Let it go</button></div></div>`).join('')
+    : `<p class="empty">No parked worries. Send one here from the inbox.</p>`;
+}
+function breathe() {
+  if (B.running) return stopBreath('Paused');
+  const ph = B.easy ? [['Breathe in', 3, 1.9], ['Hold', 4, 1.9], ['Breathe out', 5, 1]] : [['Breathe in', 4, 1.9], ['Hold', 7, 1.9], ['Breathe out', 8, 1]];
+  B.running = true; $('#breathbtn').textContent = 'Stop';
+  let round = 1, p = 0, left = ph[0][1];
+  const orb = $('#orb');
+  const setPhase = () => {
+    $('#phase').textContent = ph[p][0];
+    orb.style.transitionDuration = ph[p][0] === 'Hold' ? '0s' : ph[p][1] + 's';
+    orb.style.transform = `scale(${ph[p][2]})`;
+    $('#roundinfo').textContent = `Round ${round} of ${B.rounds}`;
+    if (navigator.vibrate) navigator.vibrate(25);
+  };
+  setPhase(); $('#count').textContent = left;
+  B.timer = setInterval(() => {
+    left--;
+    if (left <= 0) {
+      p++;
+      if (p >= ph.length) { p = 0; round++; if (round > B.rounds) return stopBreath('Done. Notice how you feel.'); }
+      left = ph[p][1]; setPhase();
+    }
+    $('#count').textContent = left;
+  }, 1000);
+}
+function stopBreath(msg) {
+  clearInterval(B.timer); B.running = false;
+  const orb = $('#orb'); if (!orb) return;
+  orb.style.transitionDuration = '1.2s'; orb.style.transform = 'scale(1)';
+  $('#phase').textContent = msg.startsWith('Done') ? 'Done' : 'Ready'; $('#count').textContent = '';
+  $('#roundinfo').textContent = msg; $('#breathbtn').textContent = 'Start';
+}
+
+/* ---------- Medication ---------- */
+function medStatus() {
+  const p = S.plan; if (!p) return null;
+  const d = dosesToday(), n = d.length, max = p.max_per_day;
+  const after = p.second_cutoff && hm24(new Date()) > p.second_cutoff.slice(0, 5);
+  if (n === 0) return { text: 'No dose logged today', canLog: true };
+  if (n >= max) return { text: `${n === 2 ? 'Both doses' : n + ' doses'} logged today \u2713`, sub: 'Next dose tomorrow.', canLog: false };
+  return { text: `${n === 1 ? 'Morning dose' : n + ' doses'} \u2713 ${t12(new Date(d[0].taken_at))}`,
+    sub: p.second_cutoff ? (after ? `Second dose window closed at ${cut12(p.second_cutoff)}.` : `Second dose available until ${cut12(p.second_cutoff)}.`) : 'Set a second-dose cutoff in your plan.',
+    canLog: true };
+}
+function medBlock(compact) {
+  if (!S.plan) return compact ? `<section class="block"><h2>Medication</h2><p class="muted" style="margin:0 0 12px">Enter your prescription once to start logging.</p>
+    <button class="btn soft" data-act="go" data-v="meds">Set up</button></section>` : '';
+  const s = medStatus();
+  return `<section class="block"><h2>${esc(S.plan.medicine)} ${esc(S.plan.strength)}</h2>
+    <p class="status" style="margin:0">${s.text}</p>${s.sub ? `<p class="muted" style="margin:2px 0 12px">${s.sub}</p>` : '<div style="height:12px"></div>'}
+    ${s.canLog ? `<button class="btn" data-act="log-dose">Log dose now</button>` : ''}
+    ${!compact && s.canLog ? `<details style="margin-top:12px"><summary class="muted">Took it earlier?</summary>
+      <div class="row" style="margin-top:10px"><input id="dosetime" type="time" value="${hm24(new Date())}" aria-label="Time taken">
+      <button class="btn soft" data-act="log-dose-at">Log at this time</button></div></details>` : ''}</section>`;
+}
+function vMeds() {
+  if (!S.plan) return topBar('Medication') + planForm();
+  const byDay = {};
+  S.doses.forEach(d => { const k = ymd(new Date(d.taken_at)); (byDay[k] = byDay[k] || []).push(d); });
+  const days = Object.keys(byDay).sort().reverse();
+  return topBar('Medication') + medBlock(false) + `
+  <section class="block"><h2>Last 7 days</h2>
+    ${days.length ? `<ul class="list">${days.map(k => `<li class="item"><span class="grow"><b>${fmt({ weekday:'short', month:'short', day:'numeric' }).format(new Date(k + 'T12:00:00'))}</b><br>
+      <span class="small">${byDay[k].sort((a, b) => new Date(a.taken_at) - new Date(b.taken_at)).map(d => `<button class="chip" data-act="dose-notes" data-id="${d.id}">${t12(new Date(d.taken_at))}${d.focus || d.appetite || d.sleep ? ' \u270E' : ''}</button>`).join(' ')}</span></span></li>`).join('')}</ul>`
+      : `<p class="empty">No doses logged yet.</p>`}
+    <p class="small muted" style="margin:10px 0 0">Tap a dose to add focus, appetite and sleep notes for your prescriber.</p></section>
+  <section class="block"><h2>Your plan</h2>
+    <p style="margin:0">Up to ${S.plan.max_per_day} a day${(S.plan.usual_times || []).length ? ` \u00b7 usually ${S.plan.usual_times.map(cut12).join(' and ')}` : ''}${S.plan.second_cutoff ? ` \u00b7 no second dose after ${cut12(S.plan.second_cutoff)}` : ''}</p>
+    <p class="small muted">This records what your prescriber set. It never suggests changes. Medication stays private and is never sent to AI.</p>
+    <button class="btn ghost" data-act="edit-plan">Edit plan</button></section>`;
+}
+function planForm() {
+  const p = S.plan || { medicine:'Adderall', strength:'5 mg', max_per_day:2, usual_times:[], second_cutoff:'' };
+  return `<section class="block"><h2>${S.plan ? 'Edit plan' : 'Your prescription'}</h2>
+    <p class="muted small" style="margin:0">Enter what your prescriber set. You only do this once.</p>
+    <label class="f" for="pm">Medicine</label><input id="pm" type="text" value="${esc(p.medicine)}">
+    <label class="f" for="ps">Strength</label><input id="ps" type="text" value="${esc(p.strength)}">
+    <label class="f" for="px">Maximum doses per day</label><input id="px" type="number" min="1" max="4" value="${p.max_per_day}">
+    <label class="f" for="pu">Usual morning time</label><input id="pu" type="time" value="${(p.usual_times || [])[0]?.slice(0, 5) || ''}">
+    <label class="f" for="pc">Latest time for a second dose</label><input id="pc" type="time" value="${p.second_cutoff?.slice(0, 5) || ''}">
+    <button class="btn wide" style="margin-top:16px" data-act="save-plan">Save plan</button>
+    ${S.plan ? `<button class="btn ghost wide" style="margin-top:10px" data-act="go" data-v="meds">Cancel</button>` : ''}</section>`;
+}
+function logDose(at) {
+  const p = S.plan, d = dosesToday(), when = at || new Date();
+  if (ymd(when) !== today()) return toast('Pick a time from today.');
+  if (d.length >= p.max_per_day) return toast(`You\u2019ve logged ${d.length} doses today. Another can\u2019t be logged.`, 4500);
+  const last = d[d.length - 1];
+  if (last && Math.abs(when - new Date(last.taken_at)) < 20 * 60e3 &&
+      !confirm(`You logged a dose at ${t12(new Date(last.taken_at))}. Log another one?`)) return;
+  if (d.length >= 1 && p.second_cutoff && hm24(when) > p.second_cutoff.slice(0, 5) &&
+      !confirm(`This is after your ${cut12(p.second_cutoff)} cutoff for a second dose. Log it anyway?`)) return;
+  save('jo_med_doses', { plan_id: p.id, taken_at: when.toISOString() });
+  toast(`Logged at ${t12(when)}.`);
+}
+
+/* ---------- Sheets ---------- */
+function sheet(html) {
+  closeSheet();
+  const s = document.createElement('div'); s.className = 'scrim'; s.id = 'scrim';
+  s.innerHTML = `<div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
+  s.addEventListener('click', e => { if (e.target === s) closeSheet(); });
+  document.body.appendChild(s);
+  const f = s.querySelector('[autofocus],textarea,input'); if (f) setTimeout(() => f.focus(), 60);
+}
+function closeSheet() { const s = $('#scrim'); if (s) s.remove(); if (rec) { try { rec.stop(); } catch {} } }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+let rec = null;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+function openCapture() {
+  sheet(`<h2>What\u2019s on your mind?</h2><p class="muted small" style="margin:0 0 12px">It goes to your inbox. Sort it later.</p>
+    <textarea id="cap" placeholder="A task, a worry, an idea\u2026" aria-label="Capture"></textarea>
+    <div class="row" style="margin-top:12px">${SR ? `<button class="btn ghost" data-act="mic" id="micbtn" aria-label="Speak">\uD83C\uDF99\uFE0F Speak</button>` : ''}
+    <button class="btn" style="flex:1" data-act="save-capture">Save to inbox</button></div>`);
+}
+function toggleMic() {
+  if (rec) { rec.stop(); return; }
+  rec = new SR(); rec.lang = 'en-US'; rec.interimResults = true; rec.continuous = true;
+  const ta = $('#cap'), start = ta.value ? ta.value.trimEnd() + ' ' : '';
+  rec.onresult = e => { ta.value = start + Array.from(e.results).map(r => r[0].transcript).join(''); };
+  rec.onend = () => { rec = null; const b = $('#micbtn'); if (b) b.textContent = '\uD83C\uDF99\uFE0F Speak'; };
+  rec.onerror = () => toast('Couldn\u2019t hear that. Check microphone permission.');
+  rec.start(); $('#micbtn').textContent = '\u23F9 Stop';
+}
+
+let CI = {};
+function openCheckin() {
+  const c = todayCheckin() || {};
+  CI = { mood: c.mood, anxiety: c.anxiety, focus: c.focus, sleep_hours: c.sleep_hours ?? 7, note: c.note || '' };
+  const scale = (k, label, lo, hi) => `<label class="f">${label}</label><div class="scale" role="group" aria-label="${label}">
+    ${[1, 2, 3, 4, 5].map(v => `<button class="${CI[k] === v ? 'on' : ''}" data-act="scale" data-k="${k}" data-v="${v}" aria-pressed="${CI[k] === v}">${v}</button>`).join('')}</div>
+    <div class="scale-ends"><span>${lo}</span><span>${hi}</span></div>`;
+  sheet(`<h2>Check-in</h2>
+    ${scale('mood', 'Mood', 'Low', 'Great')}${scale('anxiety', 'Anxiety', 'Calm', 'High')}${scale('focus', 'Focus', 'Scattered', 'Sharp')}
+    <label class="f">Sleep last night</label><div class="stepper"><button data-act="sleep" data-d="-0.5" aria-label="Less sleep">\u2212</button>
+      <output id="sleepv">${CI.sleep_hours}h</output><button data-act="sleep" data-d="0.5" aria-label="More sleep">+</button></div>
+    <label class="f" for="cinote">Note (optional)</label><textarea id="cinote" style="min-height:80px">${esc(CI.note)}</textarea>
+    <button class="btn wide" style="margin-top:16px" data-act="save-checkin">Save check-in</button>`);
+}
+
+function openDoseNotes(id) {
+  const d = find('doses', id); if (!d) return;
+  CI = { _dose: id, focus: d.focus, appetite: d.appetite, sleep: d.sleep };
+  const scale = (k, label, lo, hi) => `<label class="f">${label}</label><div class="scale">
+    ${[1, 2, 3, 4, 5].map(v => `<button class="${CI[k] === v ? 'on' : ''}" data-act="scale" data-k="${k}" data-v="${v}" aria-pressed="${CI[k] === v}">${v}</button>`).join('')}</div>
+    <div class="scale-ends"><span>${lo}</span><span>${hi}</span></div>`;
+  sheet(`<h2>Dose at ${t12(new Date(d.taken_at))}</h2><p class="muted small" style="margin:0">Notes to bring to your prescriber.</p>
+    ${scale('focus', 'Focus', 'Poor', 'Great')}${scale('appetite', 'Appetite', 'None', 'Normal')}${scale('sleep', 'Sleep that night', 'Poor', 'Great')}
+    <button class="btn wide" style="margin-top:16px" data-act="save-dose-notes">Save notes</button>
+    <button class="btn ghost wide" style="margin-top:10px" data-act="del-dose">Delete this dose</button>`);
+}
+
+function openSettings() {
+  sheet(`<h2>Settings</h2>
+    <p class="muted" style="margin:0 0 14px">Signed in as ${esc(user.email)}</p>
+    <p class="small">${Q.length ? `${Q.length} change${Q.length > 1 ? 's' : ''} waiting to sync.` : 'Everything is synced.'}</p>
+    <button class="btn soft wide" data-act="export">Export all my data</button>
+    <button class="btn ghost wide" style="margin-top:10px" data-act="signout">Sign out</button>
+    <p class="small muted" style="margin-top:16px">${CFG.name} \u00b7 phase 1 + journey</p>`);
+}
+
+async function exportAll() {
+  const tables = ['jo_profile','jo_inbox','jo_tasks','jo_projects','jo_worries','jo_checkins','jo_scores','jo_med_plan','jo_med_doses','jo_focus','jo_journal','jo_dreams','jo_media','jo_routines','jo_routine_runs','jo_shared_feed','jo_journey_audio'];
+  const out = { exported_at: new Date().toISOString() };
+  for (const t of tables) { const r = await sb.from(t).select('*'); if (r.error) return toast('Export failed: ' + r.error.message); out[t] = r.data; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' }));
+  a.download = `steady-bear-export-${today()}.json`; a.click(); toast('Export downloaded.');
+}
+
+/* ---------- Actions ---------- */
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act, id = b.dataset.id;
+  switch (a) {
+    case 'go': view = b.dataset.v; JC = null; closeSheet(); $('#view') && ($('#view').innerHTML = ''); stopBreathIfLeaving(); render(); window.scrollTo(0, 0); break;
+    case 'capture': openCapture(); break;
+    case 'open-chapter': view = 'journey'; JC = b.dataset.k; closeSheet(); stopBreathIfLeaving(); $('#view').innerHTML = ''; render(); window.scrollTo(0, 0); loadChapterAudio(); break;
+    case 'chapter-done': {
+      const i = CH.findIndex(c => c.key === b.dataset.k); markRead(b.dataset.k);
+      const nx = CH[i + 1];
+      if (nx) { JC = nx.key; $('#view').innerHTML = ''; render(); window.scrollTo(0, 0); loadChapterAudio(); }
+      else { JC = null; view = 'today'; $('#view').innerHTML = ''; render(); window.scrollTo(0, 0); toast('Journey complete. Nice work. \uD83D\uDC3B', 3500); }
+      break; }
+    case 'try': {
+      const c = CH.find(x => x.key === b.dataset.k); markRead(c.key);
+      if (c.tryIt.act === 'capture') openCapture(); else if (c.tryIt.act === 'checkin') openCheckin();
+      else { view = c.tryIt.v; JC = null; $('#view').innerHTML = ''; render(); window.scrollTo(0, 0); }
+      break; }
+    case 'mic': toggleMic(); break;
+    case 'save-capture': {
+      const v = $('#cap').value.trim(); if (!v) return closeSheet();
+      save('jo_inbox', { text: v }); closeSheet(); toast('In your inbox.'); break; }
+    case 'add-task': {
+      const v = $('#newtask').value.trim(); if (!v) return;
+      save('jo_tasks', { title: v }); $('#newtask')?.focus(); break; }
+    case 'toggle-task': { const t = find('tasks', id); save('jo_tasks', { id, done_at: t.done_at ? null : new Date().toISOString() }); break; }
+    case 'star': {
+      const t = find('tasks', id);
+      if (t.top3_date === today()) save('jo_tasks', { id, top3_date: null });
+      else if (topThree().length >= 3) toast('Today\u2019s three is full. Finish or unstar one first.');
+      else save('jo_tasks', { id, top3_date: today() });
+      break; }
+    case 'del-task': S.tasks = S.tasks.filter(t => t.id !== id); Q.push({ k:'del', t:'jo_tasks', id }); persist(); render(); flush(); break;
+    case 'sort': {
+      const i = find('inbox', id), to = b.dataset.to;
+      if (to === 'task' || to === 'top3') {
+        const full = to === 'top3' && topThree().length >= 3;
+        save('jo_tasks', { title: i.text, top3_date: to === 'top3' && !full ? today() : null });
+        if (full) toast('Today\u2019s three is full, so it went to tasks.');
+      }
+      if (to === 'worry') save('jo_worries', { text: i.text, parked_for: today() });
+      save('jo_inbox', { id, sorted_at: new Date().toISOString(), sorted_into: to === 'top3' ? 'task' : to });
+      break; }
+    case 'worry-task': { const w = find('worries', id); save('jo_tasks', { title: w.text });
+      save('jo_worries', { id, outcome:'step', next_step: w.text, resolved_at: new Date().toISOString() }); toast('Added to tasks.'); break; }
+    case 'worry-go': save('jo_worries', { id, outcome:'let_go', resolved_at: new Date().toISOString() }); toast('Let go.'); break;
+    case 'checkin': openCheckin(); break;
+    case 'scale': CI[b.dataset.k] = +b.dataset.v;
+      b.parentElement.querySelectorAll('button').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); }); break;
+    case 'sleep': CI.sleep_hours = Math.max(0, Math.min(16, (+CI.sleep_hours) + (+b.dataset.d))); $('#sleepv').textContent = CI.sleep_hours + 'h'; break;
+    case 'save-checkin': save('jo_checkins', { day: today(), mood: CI.mood ?? null, anxiety: CI.anxiety ?? null, focus: CI.focus ?? null,
+      sleep_hours: CI.sleep_hours, note: $('#cinote').value.trim() || null }); closeSheet(); toast('Check-in saved.'); break;
+    case 'log-dose': logDose(); break;
+    case 'log-dose-at': { const [h, m] = $('#dosetime').value.split(':').map(Number); const d = new Date(); d.setHours(h, m, 0, 0);
+      if (d > new Date()) return toast('That time hasn\u2019t happened yet.'); logDose(d); break; }
+    case 'dose-notes': openDoseNotes(id); break;
+    case 'save-dose-notes': save('jo_med_doses', { id: CI._dose, focus: CI.focus ?? null, appetite: CI.appetite ?? null, sleep: CI.sleep ?? null }); closeSheet(); toast('Notes saved.'); break;
+    case 'del-dose': if (!confirm('Delete this dose from the log?')) return;
+      S.doses = S.doses.filter(d => d.id !== CI._dose); Q.push({ k:'del', t:'jo_med_doses', id: CI._dose }); persist(); closeSheet(); render(); flush(); break;
+    case 'edit-plan': $('#view').innerHTML = topBar('Medication') + planForm(); renderSync(); break;
+    case 'save-plan': {
+      const max = Math.max(1, Math.min(4, +$('#px').value || 2));
+      const row = { medicine: $('#pm').value.trim() || 'Medication', strength: $('#ps').value.trim(), max_per_day: max,
+        usual_times: $('#pu').value ? [$('#pu').value + ':00'] : [], second_cutoff: $('#pc').value ? $('#pc').value + ':00' : null, active: true };
+      if (S.plan) row.id = S.plan.id;
+      save('jo_med_plan', row); toast('Plan saved.'); break; }
+    case 'rounds': B.rounds = +b.dataset.r; b.parentElement.querySelectorAll('[data-act=rounds]').forEach(x => x.classList.toggle('on', x === b)); break;
+    case 'easy': B.easy = !B.easy; b.classList.toggle('on', B.easy); break;
+    case 'breathe': breathe(); break;
+    case 'settings': openSettings(); break;
+    case 'export': exportAll(); break;
+    case 'signout': closeSheet(); localStorage.removeItem('jo.member'); S = { ...EMPTY }; store('jo.cache', S); await sb.auth.signOut(); renderSignIn(); break;
+    case 'send-code': {
+      const em = $('#em').value.trim().toLowerCase(); if (!em) return;
+      store('jo.email', em); b.disabled = true;
+      const { error } = await sb.auth.signInWithOtp({ email: em, options: { shouldCreateUser: false, emailRedirectTo: location.origin + location.pathname } });
+      if (error) { b.disabled = false; $('#authmsg').textContent = error.message; return; }
+      renderSignIn('code', em); break; }
+    case 'verify-code': {
+      const em = load('jo.email', ''), code = $('#code').value.trim();
+      const { error } = await sb.auth.verifyOtp({ email: em, token: code, type: 'email' });
+      if (error) $('#authmsg').textContent = 'That code didn\u2019t work. Check it, or use the link in the email.';
+      break; }
+    case 'back-email': renderSignIn('email'); break;
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.id === 'newtask') { e.preventDefault(); document.querySelector('[data-act=add-task]').click(); }
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && e.target.id === 'cap') document.querySelector('[data-act=save-capture]').click();
+});
+function stopBreathIfLeaving() { if (view !== 'calm' && B.running) stopBreath('Paused'); }
+document.addEventListener('visibilitychange', () => { if (!document.hidden && user) refresh().then(flush); });
+
+boot();
+</script>
+</body>
+</html>
